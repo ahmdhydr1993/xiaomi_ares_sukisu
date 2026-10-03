@@ -81,7 +81,10 @@ jobs:
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_user_defconfig
           echo "KSU_MULTI_MANAGER_SUPPORT=y" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_user_defconfig
           echo "KSU_FULL_NAME_FORMAT=\"%TAG_NAME%-%KSU_VERSION%@%REPO_NAME%\"" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_user_defconfig
-      
+          echo "CONFIG_CFG80211=y" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_defconfig
+          echo "CONFIG_MAC80211=y" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_defconfig
+          echo "CONFIG_RT2800USB=y" >> $GITHUB_WORKSPACE/kernel/arch/arm64/configs/ares_defconfig
+
       - name: Build Kernel for K40GE
         working-directory: kernel
         env:
