@@ -61,14 +61,38 @@ jobs:
       
       - name: Set up ReSukiSU
         working-directory: kernel
-        run: |
+        run:
           echo DATE=$(date +%F) >> $GITHUB_ENV
-          curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
           cd ./KernelSU
-          export KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 30000 "+" 700)
+          export KSU_VERSION=$(expr $(/usr/bin/git rev-list --count HEAD) + 10200)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
-          sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
+          sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=$KSU_VERSION/g" Makefile
 
+      - name: Enable Wireless and RT3070 Drivers
+        working-directory: kernel
+        run: |
+          CONFIG_FILE=$(find arch/arm64/configs/ -name "*defconfig" | head -n 1)
+          cat <<EOF >> $CONFIG_FILE
+
+          # Wireless Core Support
+          CONFIG_WIRELESS=y
+          CONFIG_CFG80211=y
+          CONFIG_MAC80211=y
+
+          # Ralink RT3070 Drivers
+          CONFIG_NETDEVICES=y
+          CONFIG_WLAN=y
+          CONFIG_RT2X00=y
+          CONFIG_RT2X00_LIB_USB=y
+          CONFIG_RT2X00_LIB_FIRMWARE=y
+          CONFIG_RT2800USB=y
+          CONFIG_RT2800USB_RT33XX=y
+          CONFIG_RT2800USB_RT53XX=y
+          CONFIG_RT2800USB_UNKNOWN=y
+          EOF
+          echo "Updated configuration file: $CONFIG_FILE"
+          
       - name: Patch Kernel
         working-directory: kernel
         run: |
